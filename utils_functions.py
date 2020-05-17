@@ -16,7 +16,8 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.preprocessing.image import load_img
 
-
+IMG_WIDTH = 224
+IMG_HEIGHT = 224
 
 def mkdir_dir(dir):
     if not os.path.exists(dir):
@@ -59,7 +60,7 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
 
 def load_image(path, preprocess=True):
     """Load and preprocess image."""
-    x = image.load_img(path, target_size=(img_height, img_width))
+    x = image.load_img(path, target_size=(IMG_HEIGHT, IMG_WIDTH))
     if preprocess:
         x = image.img_to_array(x)
         x = np.expand_dims(x, axis=0)
@@ -130,7 +131,7 @@ def grad_cam(input_model, image, cls, layer_name):
     weights = np.mean(grads_val, axis=(0, 1))
     cam = np.dot(output, weights)
     # Process CAM
-    cam = cv2.resize(cam, (img_width, img_height), cv2.INTER_LINEAR)
+    cam = cv2.resize(cam, (IMG_WIDTH, IMG_HEIGHT), cv2.INTER_LINEAR)
     cam = np.maximum(cam, 0)
     cam = cam / cam.max()
     return cam
@@ -146,11 +147,11 @@ def grad_cam_batch(input_model, images, classes, layer_name):
     weights = np.mean(grads_val, axis=(1, 2))
     cams = np.einsum('ijkl,il->ijk', conv_output, weights)
     # Process CAMs
-    new_cams = np.empty((images.shape[0], img_height, img_width))
+    new_cams = np.empty((images.shape[0], IMG_HEIGHT, IMG_WIDTH))
     for i in range(new_cams.shape[0]):
         cam_i = cams[i] - cams[i].mean()
         cam_i = (cam_i + 1e-10) / (np.linalg.norm(cam_i, 2) + 1e-10)
-        new_cams[i] = cv2.resize(cam_i, (img_width, img_height), cv2.INTER_LINEAR)
+        new_cams[i] = cv2.resize(cam_i, (IMG_WIDTH, IMG_HEIGHT), cv2.INTER_LINEAR)
         new_cams[i] = np.maximum(new_cams[i], 0)
         new_cams[i] = new_cams[i] / new_cams[i].max()
     return new_cams
