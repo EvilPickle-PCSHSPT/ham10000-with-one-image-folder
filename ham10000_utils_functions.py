@@ -171,7 +171,7 @@ def compute_saliency(model, guided_model, img_path, layer_name='block5_conv3', c
         print('\t{:15s}\t({})\twith probability {:.3f}'.format(p[1], c, p[2]))
     if cls == -1:
         cls = np.argmax(predictions)
-    class_name = my_decode_predictions(np.eye(1, 4, cls))[0][0][1]
+    class_name = my_decode_predictions(np.eye(1, 7, cls))[0][0][1]
     print("Explanation for '{}'".format(class_name))  
     gradcam = grad_cam(model, preprocessed_input, cls, layer_name)
     gb = guided_backprop(guided_model, preprocessed_input, layer_name)
