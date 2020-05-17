@@ -92,7 +92,7 @@ def deprocess_image(x):
     x = np.clip(x, 0, 255).astype('uint8')
     return x
 
-def decode_predictions(preds, top=5, class_list_path='/content/ham10000-with-one-image-folder/HAM10000_index.json'):
+def my_decode_predictions(preds, top=5, class_list_path='/content/ham10000-with-one-image-folder/HAM10000_index.json'):
   if len(preds.shape) != 2 or preds.shape[1] != 7:
     raise ValueError('`decode_predictions` expects '
                      'a batch of predictions '
@@ -164,14 +164,14 @@ def compute_saliency(model, guided_model, img_path, layer_name='block5_conv3', c
     preprocessed_input = load_image(img_path)
     predictions = model.predict(preprocessed_input)
     top_n = 5
-    top = decode_predictions(predictions, top=top_n)[0]
+    top = my_decode_predictions(predictions, top=top_n)[0]
     classes = np.argsort(predictions[0])[-top_n:][::-1]
     print('Model prediction:')
     for c, p in zip(classes, top):
         print('\t{:15s}\t({})\twith probability {:.3f}'.format(p[1], c, p[2]))
     if cls == -1:
         cls = np.argmax(predictions)
-    class_name = decode_predictions(np.eye(1, 4, cls))[0][0][1]
+    class_name = my_decode_predictions(np.eye(1, 4, cls))[0][0][1]
     print("Explanation for '{}'".format(class_name))  
     gradcam = grad_cam(model, preprocessed_input, cls, layer_name)
     gb = guided_backprop(guided_model, preprocessed_input, layer_name)
